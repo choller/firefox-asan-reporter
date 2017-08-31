@@ -63,19 +63,25 @@ function processDirectory(pathString) {
   ).then(
     () => {
       iterator.close();
-
       log("Processing " + results.length + " reports...")
 
-      if (results.length > 0) {
-        // Submit the first report ...
-        let promise = submitReport(results[0].path);
+      // Sequentially submit all reports that we found. Note that doing this
+      // with Promise.all would not result in a sequential ordering and would
+      // cause multiple requests to be sent to the server at once.
+      let requests = Promise.resolve()
+      results.forEach(
+        (result) => { requests = requests.then(
+          // We return a promise here that already handles any submit failures
+          // so our chain is not interrupted if one of the reports couldn't
+          // be submitted for some reason.
+          () => submitReport(result.path).then(
+            () => { logger.info("Successfully submitted " + result.path) },
+            (e) => { logger.error("Failed to submit " + result.path + ". Reason: " + e) },
+          )
+        )}
+      )
 
-        // ... then chain all other report submit calls
-        for (let i = 1; i < results.length; ++i) {
-          let f = function() { return submitReport(results[i].path) }
-          promise = promise.then(f,f);
-        }
-      }
+      requests.then(() => log("Done processing reports."))
     },
     (e) => {
       iterator.close();
