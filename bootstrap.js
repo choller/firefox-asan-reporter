@@ -7,6 +7,7 @@ const {classes: Cc, interfaces: Ci, utils: Cu, manager: Cm} = Components;
 
 Cu.import("resource://gre/modules/AppConstants.jsm");
 Cu.import("resource://gre/modules/FileUtils.jsm");
+Cu.import("resource://gre/modules/Log.jsm");
 Cu.import("resource://gre/modules/Preferences.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
@@ -20,17 +21,20 @@ Cu.importGlobalProperties(["TextDecoder"]);
 const PREF_CLIENT_ID = "asanreporter.clientid";
 const PREF_API_URL = "asanreporter.apiurl";
 const PREF_AUTH_TOKEN = "asanreporter.authtoken";
+const PREF_LOG_LEVEL = "asanreporter.loglevel";
 
-function log(aMsg) {
-  console.log("@ ASan Reporter: " + aMsg);
-}
+const LOGGER_NAME = "extensions.asanreporter";
+let logger = Log.repository.getLogger(LOGGER_NAME);
+logger.addAppender(new Log.ConsoleAppender(new Log.BasicFormatter()));
+logger.addAppender(new Log.DumpAppender(new Log.BasicFormatter()));
+logger.level = Preferences.get(PREF_LOG_LEVEL, Log.Level.Info);
 
 function install(aData, aReason) {}
 
 function uninstall(aData, aReason) {}
 
 function startup(aData, aReason) {
-  log("startup");
+  logger.info("Starting up...");
   // We could use OS.Constants.Path.tmpDir here, but unfortunately there is
   // no way in C++ to get the same value *prior* to xpcom initialization.
   // Since ASan needs its options, including the "log_path" option already
@@ -43,7 +47,7 @@ function startup(aData, aReason) {
 }
 
 function shutdown(aData, aReason) {
-  log("shutdown");
+  logger.info("Shutting down...");
 }
 
 function processDirectory(pathString) {
@@ -63,7 +67,7 @@ function processDirectory(pathString) {
   ).then(
     () => {
       iterator.close();
-      log("Processing " + results.length + " reports...")
+      logger.info("Processing " + results.length + " reports...")
 
       // Sequentially submit all reports that we found. Note that doing this
       // with Promise.all would not result in a sequential ordering and would
@@ -85,13 +89,13 @@ function processDirectory(pathString) {
     },
     (e) => {
       iterator.close();
-      log("Error: " + e);
+      logger.error("Error while iterating over report files: " + e);
     }
   );
 }
 
 function submitReport(reportFile) {
-  log("Processing " + reportFile);
+  logger.info("Processing " + reportFile);
   return OS.File.read(reportFile).then(submitToServer).then(
     () => {
       // Mark as submitted only if we successfully submitted it to the server.
@@ -102,7 +106,7 @@ function submitReport(reportFile) {
 
 function submitToServer(data) {
   return new Promise(function (resolve, reject) {
-      log("Setting up XHR request");
+      logger.debug("Setting up XHR request");
       let cid = Preferences.get(PREF_CLIENT_ID);
       let api_url = Preferences.get(PREF_API_URL);
       let auth_token = Preferences.get(PREF_AUTH_TOKEN);
@@ -149,10 +153,10 @@ function submitToServer(data) {
       xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
           if (xhr.status == "201") {
-            log("XHR: OK");
+            logger.debug("XHR: OK");
             resolve(xhr);
           } else {
-            log("XHR: Status: " + xhr.status + " Response: " + xhr.responseText);
+            logger.debug("XHR: Status: " + xhr.status + " Response: " + xhr.responseText);
             reject(xhr);
           }
         }
