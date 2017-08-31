@@ -17,10 +17,6 @@ XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm
 
 Cu.importGlobalProperties(["TextDecoder"]);
 
-XPCOMUtils.defineLazyGetter(this, "gTextDecoder", function() {
-  return new TextDecoder();
-});
-
 const PREF_CLIENT_ID = "asanreporter.clientid";
 const PREF_API_URL = "asanreporter.apiurl";
 const PREF_AUTH_TOKEN = "asanreporter.authtoken";
@@ -106,7 +102,7 @@ function submitToServer(data) {
       let api_url = Preferences.get(PREF_API_URL);
       let auth_token = Preferences.get(PREF_AUTH_TOKEN);
 
-      let decoder = gTextDecoder;
+      let decoder = new TextDecoder();
 
       if (!cid) {
         cid = "unknown";
