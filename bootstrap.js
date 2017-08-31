@@ -86,10 +86,12 @@ function processDirectory(pathString) {
 
 function submitReport(reportFile) {
   log("Processing " + reportFile);
-  let markSubmitted = function() {
-    return OS.File.move(reportFile, reportFile + ".submitted")
-  }
-  return OS.File.read(reportFile).then(submitToServer).then(markSubmitted);
+  return OS.File.read(reportFile).then(submitToServer).then(
+    () => {
+      // Mark as submitted only if we successfully submitted it to the server.
+      return OS.File.move(reportFile, reportFile + ".submitted")
+    }
+  );
 }
 
 function submitToServer(data) {
@@ -111,7 +113,7 @@ function submitToServer(data) {
         (AppConstants.SOURCE_REVISION_URL || "unknown")
       ]
 
-      // Concatenate all relevant information as FuzzManager only
+      // Concatenate all relevant information as our server only
       // has one field available for version information.
       let version = versionArr.join("-");
       let os = AppConstants.platform;
