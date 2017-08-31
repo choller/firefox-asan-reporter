@@ -53,17 +53,15 @@ function processDirectory(pathString) {
   // Scan the directory for any ASan logs that we haven't
   // submitted yet. Store the filenames in an array so we
   // can close the iterator early.
-  let promise = iterator.forEach(
-    function onEntry(entry) {
+  iterator.forEach(
+    (entry) => {
       if (entry.name.indexOf("ff_asan_log.") == 0
         && entry.name.indexOf("submitted") < 0) {
         results.push(entry);
       }
     }
-  );
-
-  promise.then(
-    function onSuccess() {
+  ).then(
+    () => {
       iterator.close();
 
       log("Processing " + results.length + " reports...")
@@ -79,10 +77,9 @@ function processDirectory(pathString) {
         }
       }
     },
-    function onFailure(reason) {
+    (e) => {
       iterator.close();
-      log("Error: " + reason);
-      throw reason;
+      log("Error: " + e);
     }
   );
 }
