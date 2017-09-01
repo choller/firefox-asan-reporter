@@ -29,3 +29,23 @@ allow us to contact them.
 This is an authorization token that can be used in test setups with a non-public
 API endpoint that requires authentication. In the final setup, this pref remains
 empty.
+
+### asanreporter.loglevel
+
+This optional variable can be used to change the default logging level. The
+reporter addon uses Log.jsm which defines the following values for different
+levels of logging:
+
+    Level Name | Value
+    ------------------
+    ALL        | 0
+    TRACE      | 10
+    DEBUG      | 20
+    CONFIG     | 30
+    INFO       | 40
+    WARN       | 50
+    ERROR      | 60
+    FATAL      | 70
+
+The default logging level is INFO. All log messages are emitted to the browser
+console and stdout.
