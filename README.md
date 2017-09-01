@@ -37,7 +37,7 @@ reporter addon uses Log.jsm which defines the following values for different
 levels of logging:
 
     | Level Name | Value |
-    | ------------------ |
+    | ---------- | ----- |
     | ALL        | 0     |
     | TRACE      | 10    |
     | DEBUG      | 20    |
