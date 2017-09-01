@@ -85,7 +85,7 @@ function processDirectory(pathString) {
         )}
       )
 
-      requests.then(() => log("Done processing reports."))
+      requests.then(() => logger.info("Done processing reports."))
     },
     (e) => {
       iterator.close();
