@@ -18,11 +18,13 @@ XPCOMUtils.defineLazyModuleGetter(this, "OS", "resource://gre/modules/osfile.jsm
 
 Cu.importGlobalProperties(["TextDecoder"]);
 
+// Define our prefs
 const PREF_CLIENT_ID = "asanreporter.clientid";
 const PREF_API_URL = "asanreporter.apiurl";
 const PREF_AUTH_TOKEN = "asanreporter.authtoken";
 const PREF_LOG_LEVEL = "asanreporter.loglevel";
 
+// Setup logging
 const LOGGER_NAME = "extensions.asanreporter";
 let logger = Log.repository.getLogger(LOGGER_NAME);
 logger.addAppender(new Log.ConsoleAppender(new Log.BasicFormatter()));
