@@ -48,4 +48,5 @@ levels of logging:
 | FATAL      | 70    |
 
 The default logging level is INFO. All log messages are emitted to the browser
-console and stdout.
+console and stdout. Switching the logging level to DEBUG causes additional
+debug messages related to server requests (XHR) to be emitted.
