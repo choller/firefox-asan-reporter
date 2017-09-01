@@ -36,16 +36,16 @@ This optional variable can be used to change the default logging level. The
 reporter addon uses Log.jsm which defines the following values for different
 levels of logging:
 
-    Level Name | Value
-    ------------------
-    ALL        | 0
-    TRACE      | 10
-    DEBUG      | 20
-    CONFIG     | 30
-    INFO       | 40
-    WARN       | 50
-    ERROR      | 60
-    FATAL      | 70
+    | Level Name | Value |
+    | ------------------ |
+    | ALL        | 0     |
+    | TRACE      | 10    |
+    | DEBUG      | 20    |
+    | CONFIG     | 30    |
+    | INFO       | 40    |
+    | WARN       | 50    |
+    | ERROR      | 60    |
+    | FATAL      | 70    |
 
 The default logging level is INFO. All log messages are emitted to the browser
 console and stdout.
