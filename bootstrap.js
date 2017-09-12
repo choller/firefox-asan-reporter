@@ -76,15 +76,17 @@ function processDirectory(pathString) {
       // cause multiple requests to be sent to the server at once.
       let requests = Promise.resolve()
       results.forEach(
-        (result) => { requests = requests.then(
-          // We return a promise here that already handles any submit failures
-          // so our chain is not interrupted if one of the reports couldn't
-          // be submitted for some reason.
-          () => submitReport(result.path).then(
-            () => { logger.info("Successfully submitted " + result.path) },
-            (e) => { logger.error("Failed to submit " + result.path + ". Reason: " + e) },
+        (result) => {
+          requests = requests.then(
+            // We return a promise here that already handles any submit failures
+            // so our chain is not interrupted if one of the reports couldn't
+            // be submitted for some reason.
+            () => submitReport(result.path).then(
+              () => { logger.info("Successfully submitted " + result.path) },
+              (e) => { logger.error("Failed to submit " + result.path + ". Reason: " + e) },
+            )
           )
-        )}
+        }
       )
 
       requests.then(() => logger.info("Done processing reports."))
@@ -107,16 +109,16 @@ function submitReport(reportFile) {
 }
 
 function submitToServer(data) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
       logger.debug("Setting up XHR request");
-      let cid = Preferences.get(PREF_CLIENT_ID);
+      let client = Preferences.get(PREF_CLIENT_ID);
       let api_url = Preferences.get(PREF_API_URL);
       let auth_token = Preferences.get(PREF_AUTH_TOKEN);
 
       let decoder = new TextDecoder();
 
-      if (!cid) {
-        cid = "unknown";
+      if (!client) {
+        client = "unknown";
       }
 
       let versionArr = [
@@ -127,7 +129,7 @@ function submitToServer(data) {
 
       // Concatenate all relevant information as our server only
       // has one field available for version information.
-      let version = versionArr.join("-");
+      let product_version = versionArr.join("-");
       let os = AppConstants.platform;
 
       let reportObj = {
@@ -137,14 +139,14 @@ function submitToServer(data) {
         // Hardcode platform as there is no other reasonable platform for ASan
         platform: "x86-64",
         product: "mozilla-central-asan-nightly",
-        product_version: version,
-        os: os,
-        client: cid,
+        product_version,
+        os,
+        client,
         tool: "asan-nightly-program"
       }
 
       var xhr = new XMLHttpRequest();
-      xhr.open('POST', api_url, true);
+      xhr.open("POST", api_url, true);
       xhr.setRequestHeader("Content-Type", "application/json");
 
       // For internal testing purposes, an auth_token can be specified
@@ -152,7 +154,7 @@ function submitToServer(data) {
         xhr.setRequestHeader("Authorization", "Token " + auth_token);
       }
 
-      xhr.onreadystatechange = function () {
+      xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
           if (xhr.status == "201") {
             logger.debug("XHR: OK");
