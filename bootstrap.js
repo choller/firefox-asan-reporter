@@ -60,7 +60,7 @@ function startup(aData, aReason) {
 
   // Install a handler to observe tab crashes, so we can report those right
   // after they happen instead of relying on the user to restart the browser.
-  this.TabCrashObserver.init();
+  TabCrashObserver.init();
 
   // We could use OS.Constants.Path.tmpDir here, but unfortunately there is
   // no way in C++ to get the same value *prior* to xpcom initialization.
