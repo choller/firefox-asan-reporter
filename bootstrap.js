@@ -30,7 +30,7 @@ logger.addAppender(new Log.DumpAppender(new Log.BasicFormatter()));
 logger.level = Preferences.get(PREF_LOG_LEVEL, Log.Level.Info);
 
 // Determine the directory where ASan dumps will be located
-let profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile)
+let profileDir = Services.dirsvc.get("ProfD", Ci.nsIFile);
 let asanDumpDir = OS.Path.join(profileDir.path, "asan");
 
 this.TabCrashObserver = {
